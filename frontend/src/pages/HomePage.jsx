@@ -1,23 +1,30 @@
-import React from 'react';
+// src/pages/HomePage.jsx
+import React, { useState } from 'react';
 import {
-    Box, Container, Typography, Button, Grid, Paper, Card, CardMedia, CardContent, Chip, IconButton, TextField
+    Box, Container, Typography, Button, Grid, Paper, Card, CardMedia, CardContent, CardActions, Chip, IconButton, useTheme, useMediaQuery, Skeleton,
+    Stack, Avatar, Rating, Badge, Fade, Zoom, Grow, TextField
 } from '@mui/material';
 import {
-    ArrowForward as ArrowForwardIcon, LocalShipping as ShippingIcon, Security as SecurityIcon,
-    SupportAgent as SupportIcon, TrendingUp as TrendingIcon,
+    ArrowForward as ArrowForwardIcon, LocalShipping as ShippingIcon, Security as SecurityIcon, SupportAgent as SupportIcon, Payments as PaymentIcon, TrendingUp as TrendingIcon, ShoppingBag as ShoppingBagIcon, Favorite as FavoriteIcon, FavoriteBorder as FavoriteBorderIcon, Star as StarIcon, Timer as TimerIcon, LocalOffer as OfferIcon, Category as CategoryIcon, AutoAwesome as NewIcon, KeyboardArrowLeft, KeyboardArrowRight,Email as  EmailIcon
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from 'react-query';
-import { Carousel } from 'react-responsive-carousel';
-import 'react-responsive-carousel/lib/styles/carousel.min.css';
+import SwipeableViews from 'react-swipeable-views';
+import { autoPlay } from 'react-swipeable-views-utils';
 import productService from '../services/productService';
-import ProductCard from '../components/products/ProductCard';
 import { useSelector } from 'react-redux';
 import { selectIsAuthenticated } from '../store/slices/authSlice';
+import { formatCurrency } from '../utils/formatters';
+const AutoPlaySwipeableViews = autoPlay(SwipeableViews);
 const HomePage = () => {
     const navigate = useNavigate();
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const isTablet = useMediaQuery(theme.breakpoints.down('md'));
     const isAuthenticated = useSelector(selectIsAuthenticated);
-    const { data: featuredProducts } = useQuery(
+    const [activeStep, setActiveStep] = useState(0);
+    const [hoveredCard, setHoveredCard] = useState(null);
+    const { data: featuredProducts, isLoading: featuredLoading } = useQuery(
         'featured-products', () => productService.getFeaturedProducts()
     );
     const { data: categories } = useQuery(
@@ -26,250 +33,554 @@ const HomePage = () => {
     const { data: newArrivals } = useQuery(
         'new-arrivals', () => productService.getNewArrivals()
     );
+    const { data: bestSellers } = useQuery(
+        'best-sellers', () => productService.getProducts({ sort: 'bestselling', limit: 8 })
+    );
     const banners = [
         {
-            id: 1, image: '/images/banner1.jpg', title: 'Big Sale - Up to 50% Off', subtitle: 'On selected electronic items', buttonText: 'Shop Now', link: '/products?category=electronics',
+            id: 1, image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600', gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', title: 'Mega Sale Event', subtitle: 'Up to 70% Off on Electronics', description: 'Limited time offer on selected items', buttonText: 'Shop Now',
+            link: '/products?category=electronics',
         }, {
-            id: 2, image: '/images/banner2.jpg', title: 'Business Solutions', subtitle: 'Special pricing for bulk orders', buttonText: 'Learn More', link: '/business',
+            id: 2, image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1600', gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', title: 'Business Solutions', subtitle: 'Exclusive B2B Pricing', description: 'Register as business customer for special rates', buttonText: 'Learn More', link: '/business',
         }, {
-            id: 3, image: '/images/banner3.jpg', title: 'New Arrivals', subtitle: 'Check out the latest products', buttonText: 'Explore', link: '/products?sort=newest',
+            id: 3, image: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1600', gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', title: 'New Arrivals', subtitle: 'Latest Products Added', description: 'Be the first to explore new items', buttonText: 'Explore', link: '/products?sort=newest',
         },];
     const features = [
         {
-            icon: <ShippingIcon fontSize="large" />, title: 'Free Shipping', description: 'On orders above ₹500',
+            icon: <ShippingIcon sx={{ fontSize: 40 }} />, title: 'Free Shipping', description: 'On orders above ₹500', color: '#4CAF50', bgColor: 'rgba(76, 175, 80, 0.1)',
         }, {
-            icon: <SecurityIcon fontSize="large" />, title: 'Secure Payment', description: '100% secure transactions',
+            icon: <SecurityIcon sx={{ fontSize: 40 }} />, title: 'Secure Payment', description: '100% secure transactions', color: '#2196F3', bgColor: 'rgba(33, 150, 243, 0.1)',
         }, {
-            icon: <SupportIcon fontSize="large" />, title: '24/7 Support', description: 'Dedicated customer support',
+            icon: <SupportIcon sx={{ fontSize: 40 }} />, title: '24/7 Support', description: 'Dedicated customer service', color: '#FF9800', bgColor: 'rgba(255, 152, 0, 0.1)',
         }, {
-            icon: <TrendingIcon fontSize="large" />, title: 'Best Prices', description: 'Competitive pricing guaranteed',
+            icon: <PaymentIcon sx={{ fontSize: 40 }} />, title: 'Easy Returns', description: '30-day return policy',
+            color: '#9C27B0', bgColor: 'rgba(156, 39, 176, 0.1)',
         },];
+    const deals = [
+        { discount: '50%', category: 'Electronics', endTime: '24:00:00', color: '#FF6B6B' }, { discount: '30%', category: 'Mechanical', endTime: '12:30:00', color: '#4ECDC4' }, { discount: '40%', category: 'Safety', endTime: '18:45:00', color: '#45B7D1' }, { discount: '25%', category: 'Tools', endTime: '06:15:00', color: '#96CEB4' },];
+    const handleStepChange = (step) => {
+        setActiveStep(step);
+    };
+    const handleNext = () => {
+        setActiveStep((prevActiveStep) => (prevActiveStep + 1) % banners.length);
+    };
+    const handleBack = () => {
+        setActiveStep((prevActiveStep) => (prevActiveStep - 1 + banners.length) % banners.length);
+    };
     return (
-        <Box>
-            {/* Hero Section with Carousel */}
-            <Box sx={{ mb: 4 }}>
-                <Carousel
-                    showArrows
-                    autoPlay
-                    infiniteLoop
-                    showThumbs={false}
+        <Box sx={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
+            {/* Hero Section with Modern Carousel */}
+            <Box sx={{ position: 'relative', overflow: 'hidden' }}>
+                <AutoPlaySwipeableViews
+                    axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
+                    index={activeStep}
+                    onChangeIndex={handleStepChange}
+                    enableMouseEvents
                     interval={5000}
                 >
-                    {banners.map((banner) => (
+                    {banners.map((banner, index) => (
                         <Box
                             key={banner.id}
                             sx={{
-                                position: 'relative', height: { xs: 300, md: 500 }, backgroundImage: `url(${banner.image})`, backgroundSize: 'cover',
-                                backgroundPosition: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                height: { xs: 400, sm: 500, md: 600 }, position: 'relative', display: 'flex', alignItems: 'center', backgroundImage: `${banner.gradient}, url(${banner.image})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundBlendMode: 'overlay',
                             }}
                         >
-                            <Box
-                                sx={{
-                                    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.4)',
-                                }}
-                            />
-                            <Box
-                                sx={{
-                                    position: 'relative', textAlign: 'center', color: 'white', px: 3,
-                                }}
-                            >
-                                <Typography variant="h2" component="h1" gutterBottom>
-                                    {banner.title}
-                                </Typography>
-                                <Typography variant="h5" gutterBottom>
-                                    {banner.subtitle}
-                                </Typography>
-                                <Button
-                                    variant="contained" size="large" onClick={() => navigate(banner.link)}
-                                    sx={{ mt: 2 }}
-                                >
-                                    {banner.buttonText}
-                                </Button>
-                            </Box>
+                            <Container maxWidth="lg">
+                                <Fade in={activeStep === index} timeout={1000}>
+                                    <Grid container spacing={3} alignItems="center">
+                                        <Grid item xs={12} md={6}>
+                                            <Box sx={{ color: 'white', textAlign: { xs: 'center', md: 'left' } }}>
+                                                <Chip
+                                                    label="LIMITED OFFER" size="small" sx={{
+                                                        backgroundColor: 'rgba(255,255,255,0.2)', color: 'white', mb: 2, fontWeight: 'bold',
+                                                    }}
+                                                />
+                                                <Typography
+                                                    variant={isMobile ? 'h3' : 'h2'}
+                                                    component="h1" fontWeight="bold" gutterBottom
+                                                >
+                                                    {banner.title}
+                                                </Typography>
+                                                <Typography
+                                                    variant={isMobile ? 'h5' : 'h4'}
+                                                    gutterBottom
+                                                    sx={{ opacity: 0.95 }}
+                                                >
+                                                    {banner.subtitle}
+                                                </Typography>
+                                                <Typography
+                                                    variant="body1" sx={{ mb: 3, opacity: 0.9 }}
+                                                >
+                                                    {banner.description}
+                                                </Typography>
+                                                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                                                    <Button
+                                                        variant="contained" size="large" endIcon={<ArrowForwardIcon />}
+                                                        onClick={() => navigate(banner.link)}
+                                                        sx={{
+                                                            backgroundColor: 'white', color: theme.palette.primary.main, px: 4, py: 1.5, fontWeight: 'bold',
+                                                            '&:hover': {
+                                                                backgroundColor: 'rgba(255,255,255,0.9)', transform: 'translateY(-2px)',
+                                                                boxShadow: '0 10px 20px rgba(0,0,0,0.2)',
+                                                            }, transition: 'all 0.3s',
+                                                        }}
+                                                    >
+                                                        {banner.buttonText}
+                                                    </Button>
+                                                    <Button
+                                                        variant="outlined" size="large" sx={{
+                                                            borderColor: 'white', color: 'white', px: 4, py: 1.5,
+                                                            '&:hover': {
+                                                                backgroundColor: 'rgba(255,255,255,0.1)', borderColor: 'white',
+                                                            },
+                                                        }}
+                                                    >
+                                                        View Catalog
+                                                    </Button>
+                                                </Stack>
+                                            </Box>
+                                        </Grid>
+                                    </Grid>
+                                </Fade>
+                            </Container>
                         </Box>
                     ))}
-                </Carousel>
-            </Box>
-            <Container maxWidth="lg">
-                {/* Features Section */}
-                <Grid container spacing={3} sx={{ mb: 6 }}>
-                    {features.map((feature, index) => (
-                        <Grid item xs={12} sm={6} md={3} key={index}>
-                            <Paper
-                                sx={{
-                                    p: 3, textAlign: 'center', height: '100%', transition: 'transform 0.3s',
-                                    '&:hover': {
-                                        transform: 'translateY(-5px)',
-                                    },
-                                }}
-                                elevation={2}
-                            >
-                                <Box sx={{ color: 'primary.main', mb: 2 }}>
-                                    {feature.icon}
-                                </Box>
-                                <Typography variant="h6" gutterBottom>
-                                    {feature.title}
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary">
-                                    {feature.description}
-                                </Typography>
-                            </Paper>
-                        </Grid>
+                </AutoPlaySwipeableViews>
+                {/* Carousel Navigation */}
+                <IconButton
+                    sx={{
+                        position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', backgroundColor: 'rgba(0,0,0,0.5)', color: 'white',
+                        '&:hover': { backgroundColor: 'rgba(0,0,0,0.7)' },
+                    }}
+                    onClick={handleBack}
+                >
+                    <KeyboardArrowLeft />
+                </IconButton>
+                <IconButton
+                    sx={{
+                        position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)', backgroundColor: 'rgba(0,0,0,0.5)', color: 'white',
+                        '&:hover': { backgroundColor: 'rgba(0,0,0,0.7)' },
+                    }}
+                    onClick={handleNext}
+                >
+                    <KeyboardArrowRight />
+                </IconButton>
+                {/* Carousel Indicators */}
+                <Box
+                    sx={{
+                        position: 'absolute', bottom: 20, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 1,
+                    }}
+                >
+                    {banners.map((_, index) => (
+                        <Box
+                            key={index}
+                            onClick={() => setActiveStep(index)}
+                            sx={{
+                                width: activeStep === index ? 24 : 8, height: 8, borderRadius: 4, backgroundColor: activeStep === index ? 'white' : 'rgba(255,255,255,0.5)', cursor: 'pointer', transition: 'all 0.3s',
+                            }}
+                        />
                     ))}
-                </Grid>
-                {/* Categories Section */}
-                <Box sx={{ mb: 6 }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                        <Typography variant="h4" component="h2">
-                            Shop by Category
+                </Box>
+            </Box>
+            <Container maxWidth="lg" sx={{ py: { xs: 4, md: 8 } }}>
+                {/* Flash Deals Section */}
+                <Box sx={{ mb: 8 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                        <TimerIcon sx={{ fontSize: 32, color: '#FF6B6B', mr: 1 }} />
+                        <Typography variant="h4" fontWeight="bold" sx={{ flexGrow: 1 }}>
+                            Flash Deals
                         </Typography>
-                        <Button
-                            endIcon={<ArrowForwardIcon />}
-                            onClick={() => navigate('/products')}
-                        >
-                            View All
+                        <Button endIcon={<ArrowForwardIcon />} onClick={() => navigate('/deals')}>
+                            View All Deals
                         </Button>
                     </Box>
-                    <Grid container spacing={3}>
-                        {categories?.slice(0, 6).map((category) => (
-                            <Grid item xs={6} sm={4} md={2} key={category.id}>
-                                <Card
-                                    sx={{
-                                        cursor: 'pointer', transition: 'transform 0.3s',
-                                        '&:hover': {
-                                            transform: 'scale(1.05)',
-                                        },
-                                    }}
-                                    onClick={() => navigate(`/products?category=${category.id}`)}
-                                >
-                                    <CardMedia
-                                        component="img" height="120"
-                                        image={category.imageUrl || '/images/category-placeholder.png'}
-                                        alt={category.name}
-                                    />
-                                    <CardContent sx={{ textAlign: 'center' }}>
-                                        <Typography variant="body1">
-                                            {category.name}
+                    <Grid container spacing={2}>
+                        {deals.map((deal, index) => (
+                            <Grid item xs={6} sm={3} key={index}>
+                                <Grow in timeout={500 + index * 200}>
+                                    <Paper
+                                        sx={{
+                                            p: 2, textAlign: 'center', background: `linear-gradient(135deg, ${deal.color}15 0%, ${deal.color}05 100%)`, border: `2px solid ${deal.color}20`, cursor: 'pointer', transition: 'all 0.3s',
+                                            '&:hover': {
+                                                transform: 'translateY(-5px)', boxShadow: `0 10px 30px ${deal.color}30`,
+                                            },
+                                        }}
+                                        onClick={() => navigate(`/products?category=${deal.category.toLowerCase()}`)}
+                                    >
+                                        <Typography
+                                            variant="h3"
+                                            fontWeight="bold" sx={{ color: deal.color }}
+                                        >
+                                            {deal.discount}
                                         </Typography>
-                                        <Typography variant="caption" color="text.secondary">
-                                            {category.productCount} Products
+                                        <Typography variant="subtitle1" fontWeight="medium">
+                                            {deal.category}
                                         </Typography>
-                                    </CardContent>
-                                </Card>
+                                        <Chip
+                                            label={`Ends in ${deal.endTime}`}
+                                            size="small" sx={{
+                                                mt: 1, backgroundColor: `${deal.color}20`, color: deal.color, fontWeight: 'bold',
+                                            }}
+                                        />
+                                    </Paper>
+                                </Grow>
                             </Grid>
                         ))}
                     </Grid>
                 </Box>
-                {/* Featured Products Section */}
-                <Box sx={{ mb: 6 }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                        <Typography variant="h4" component="h2">
-                            Featured Products
-                        </Typography>
+                {/* Features Section with Modern Design */}
+                <Box sx={{ mb: 8 }}>
+                    <Grid container spacing={3}>
+                        {features.map((feature, index) => (
+                            <Grid item xs={6} md={3} key={index}>
+                                <Zoom in timeout={500 + index * 100}>
+                                    <Paper
+                                        elevation={0}
+                                        sx={{
+                                            p: 3, textAlign: 'center', backgroundColor: feature.bgColor, border: `1px solid ${feature.color}20`, borderRadius: 3, transition: 'all 0.3s', cursor: 'pointer',
+                                            '&:hover': {
+                                                transform: 'translateY(-10px)', boxShadow: `0 20px 40px ${feature.color}20`, backgroundColor: 'white',
+                                            },
+                                        }}
+                                    >
+                                        <Avatar
+                                            sx={{
+                                                width: 80, height: 80, backgroundColor: feature.bgColor, color: feature.color, margin: '0 auto 16px',
+                                            }}
+                                        >
+                                            {feature.icon}
+                                        </Avatar>
+                                        <Typography variant="h6" fontWeight="bold" gutterBottom>
+                                            {feature.title}
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary">
+                                            {feature.description}
+                                        </Typography>
+                                    </Paper>
+                                </Zoom>
+                            </Grid>
+                        ))}
+                    </Grid>
+                </Box>
+                {/* Categories Section with Image Cards */}
+                <Box sx={{ mb: 8 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+                        <Box>
+                            <Typography variant="h4" fontWeight="bold" gutterBottom>
+                                Shop by Category
+                            </Typography>
+                            <Typography variant="body1" color="text.secondary">
+                                Browse our wide range of product categories
+                            </Typography>
+                        </Box>
                         <Button
-                            endIcon={<ArrowForwardIcon />}
-                            onClick={() => navigate('/products?featured=true')}
+                            variant="outlined" endIcon={<CategoryIcon />}
+                            onClick={() => navigate('/categories')}
+                            sx={{ display: { xs: 'none', md: 'flex' } }}
+                        >
+                            All Categories
+                        </Button>
+                    </Box>
+                    <Grid container spacing={3}>
+                        {categories?.slice(0, 6).map((category, index) => (
+                            <Grid item xs={6} sm={4} md={2} key={category.id}>
+                                <Grow in timeout={500 + index * 100}>
+                                    <Card
+                                        sx={{
+                                            cursor: 'pointer',
+                                            transition: 'all 0.3s',
+                                            '&:hover': {
+                                                transform: 'translateY(-8px) scale(1.05)', boxShadow: '0 15px 30px rgba(0,0,0,0.15)',
+                                                '& .MuiCardMedia-root': {
+                                                    transform: 'scale(1.1)',
+                                                },
+                                            },
+                                        }}
+                                        onClick={() => navigate(`/products?category=${category.id}`)}
+                                    >
+                                        <Box sx={{ overflow: 'hidden', height: 140 }}>
+                                            <CardMedia
+                                                component="img" height="140"
+                                                image={category.imageUrl || `https://source.unsplash.com/400x300/?${category.name}`}
+                                                alt={category.name}
+                                                sx={{ transition: 'transform 0.3s' }}
+                                            />
+                                        </Box>
+                                        <CardContent sx={{ textAlign: 'center', p: 2 }}>
+                                            <Typography variant="subtitle1" fontWeight="bold" noWrap>
+                                                {category.name}
+                                            </Typography>
+                                            <Typography variant="caption" color="text.secondary">
+                                                {category.productCount || 0} Products
+                                            </Typography>
+                                        </CardContent>
+                                    </Card>
+                                </Grow>
+                            </Grid>
+                        ))}
+                    </Grid>
+                </Box>
+                {/* Best Sellers Section */}
+                <Box sx={{ mb: 8 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+                        <Box>
+                            <Typography variant="h4" fontWeight="bold" gutterBottom>
+                                Best Sellers
+                            </Typography>
+                            <Typography variant="body1" color="text.secondary">
+                                Our most popular products
+                            </Typography>
+                        </Box>
+                        <Button
+                            variant="contained" endIcon={<TrendingIcon />}
+                            onClick={() => navigate('/products?sort=bestselling')}
                         >
                             View All
                         </Button>
                     </Box>
                     <Grid container spacing={3}>
-                        {featuredProducts?.slice(0, 4).map((product) => (
-                            <Grid item xs={12} sm={6} md={3} key={product.id}>
-                                <ProductCard product={product} />
-                            </Grid>
-                        ))}
+                        {featuredLoading ? (
+                            [...Array(4)].map((_, index) => (
+                                <Grid item xs={12} sm={6} md={3} key={index}>
+                                    <Skeleton variant="rectangular" height={350} sx={{ borderRadius: 2 }} />
+                                </Grid>
+                            ))
+                        ) : (
+                            bestSellers?.content?.slice(0, 4).map((product, index) => (
+                                <Grid item xs={12} sm={6} md={3} key={product.id}>
+                                    <Fade in timeout={500 + index * 100}>
+                                        <Card
+                                            sx={{
+                                                height: '100%', display: 'flex', flexDirection: 'column', position: 'relative', transition: 'all 0.3s',
+                                                '&:hover': {
+                                                    transform: 'translateY(-8px)',
+                                                    boxShadow: '0 20px 40px rgba(0,0,0,0.15)',
+                                                },
+                                            }}
+                                            onMouseEnter={() => setHoveredCard(product.id)}
+                                            onMouseLeave={() => setHoveredCard(null)}
+                                        >
+                                            {/* Badges */}
+                                            <Box sx={{ position: 'absolute', top: 10, left: 10, zIndex: 1 }}>
+                                                <Chip
+                                                    label="BESTSELLER" size="small" sx={{
+                                                        backgroundColor: '#FF6B6B', color: 'white', fontWeight: 'bold',
+                                                    }}
+                                                />
+                                            </Box>
+                                            {/* Wishlist Button */}
+                                            <IconButton
+                                                sx={{
+                                                    position: 'absolute', top: 10, right: 10,
+                                                    backgroundColor: 'white', zIndex: 1,
+                                                    '&:hover': { backgroundColor: 'white' },
+                                                }}
+                                            >
+                                                <FavoriteBorderIcon />
+                                            </IconButton>
+                                            {/* Product Image */}
+                                            <Box sx={{ position: 'relative', pt: '75%', overflow: 'hidden' }}>
+                                                <CardMedia
+                                                    component="img"
+                                                    image={product.imageUrl || 'https://source.unsplash.com/400x400/?product'}
+                                                    alt={product.name}
+                                                    sx={{
+                                                        position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s', transform: hoveredCard === product.id ? 'scale(1.1)' : 'scale(1)',
+                                                    }}
+                                                />
+                                            </Box>
+                                            <CardContent sx={{ flexGrow: 1 }}>
+                                                <Typography variant="subtitle2" noWrap fontWeight="bold">
+                                                    {product.name}
+                                                </Typography>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
+                                                    <Rating value={4.5} readOnly size="small" />
+                                                    <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
+                                                        (125)
+                                                    </Typography>
+                                                </Box>
+                                                <Box sx={{ mt: 2 }}>
+                                                    <Typography variant="h6" color="primary" fontWeight="bold">
+                                                        {formatCurrency(product.basePrice)}
+                                                    </Typography>
+                                                    {product.originalPrice && (
+                                                        <Typography
+                                                            variant="body2" color="text.secondary" sx={{ textDecoration: 'line-through' }}
+                                                        >
+                                                            {formatCurrency(product.originalPrice)}
+                                                        </Typography>
+                                                    )}
+                                                </Box>
+                                            </CardContent>
+                                            <CardActions sx={{ p: 2, pt: 0 }}>
+                                                <Button
+                                                    fullWidth
+                                                    variant="contained" startIcon={<ShoppingBagIcon />}
+                                                    onClick={() => navigate(`/products/${product.id}`)}
+                                                    sx={{
+                                                        py: 1, fontWeight: 'bold',
+                                                        '&:hover': {
+                                                            transform: 'scale(1.05)',
+                                                        }, transition: 'transform 0.2s',
+                                                    }}
+                                                >
+                                                    Add to Cart
+                                                </Button>
+                                            </CardActions>
+                                        </Card>
+                                    </Fade>
+                                </Grid>
+                            ))
+                        )}
                     </Grid>
                 </Box>
                 {/* New Arrivals Section */}
-                <Box sx={{ mb: 6 }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                <Box sx={{ mb: 8 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
                         <Box>
-                            <Typography variant="h4" component="h2">
+                            <Typography variant="h4" fontWeight="bold" gutterBottom>
                                 New Arrivals
                             </Typography>
                             <Typography variant="body1" color="text.secondary">
-                                Latest products added to our catalog
+                                Fresh products just added to our catalog
                             </Typography>
                         </Box>
                         <Button
-                            endIcon={<ArrowForwardIcon />}
+                            variant="outlined" endIcon={<NewIcon />}
                             onClick={() => navigate('/products?sort=newest')}
                         >
-                            View All
+                            See More
                         </Button>
                     </Box>
                     <Grid container spacing={3}>
-                        {newArrivals?.slice(0, 4).map((product) => (
+                        {newArrivals?.slice(0, 4).map((product, index) => (
                             <Grid item xs={12} sm={6} md={3} key={product.id}>
-                                <ProductCard product={product} />
+                                <Zoom in timeout={500 + index * 100}>
+                                    <Card
+                                        sx={{
+                                            height: '100%', position: 'relative', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white', transition: 'all 0.3s',
+                                            '&:hover': {
+                                                transform: 'translateY(-8px) rotateZ(-1deg)', boxShadow: '0 20px 40px rgba(102, 126, 234, 0.4)',
+                                            },
+                                        }}
+                                    >
+                                        <Chip
+                                            label="NEW" size="small" sx={{
+                                                position: 'absolute', top: 10, left: 10,
+                                                backgroundColor: '#4CAF50', color: 'white', fontWeight: 'bold', zIndex: 1,
+                                            }}
+                                        />
+                                        <CardContent sx={{ textAlign: 'center', py: 4 }}>
+                                            <Typography variant="h6" fontWeight="bold" gutterBottom>
+                                                {product.name}
+                                            </Typography>
+                                            <Typography variant="h4" fontWeight="bold" sx={{ my: 2 }}>
+                                                {formatCurrency(product.basePrice)}
+                                            </Typography>
+                                            <Button
+                                                variant="contained" sx={{
+                                                    backgroundColor: 'white', color: theme.palette.primary.main,
+                                                    '&:hover': {
+                                                        backgroundColor: 'rgba(255,255,255,0.9)',
+                                                    },
+                                                }}
+                                                onClick={() => navigate(`/products/${product.id}`)}
+                                            >
+                                                Shop Now
+                                            </Button>
+                                        </CardContent>
+                                    </Card>
+                                </Zoom>
                             </Grid>
                         ))}
                     </Grid>
                 </Box>
                 {/* CTA Section */}
                 {!isAuthenticated && (
+                    <Fade in timeout={1000}>
+                        <Paper
+                            sx={{
+                                p: { xs: 4, md: 6 }, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white', textAlign: 'center', borderRadius: 3, position: 'relative', overflow: 'hidden',
+                            }}
+                        >
+                            {/* Background Pattern */}
+                            <Box
+                                sx={{
+                                    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, opacity: 0.1, backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill- rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h- 4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v- 4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+                                }}
+                            />
+                            <Box sx={{ position: 'relative', zIndex: 1 }}>
+                                <OfferIcon sx={{ fontSize: 60, mb: 2 }} />
+                                <Typography variant={isMobile ? 'h4' : 'h3'} fontWeight="bold" gutterBottom>
+                                    Join Our Platform Today
+                                </Typography>
+                                <Typography variant="h6" sx={{ mb: 4, opacity: 0.95 }}>
+                                    Get exclusive deals, business pricing, and member benefits!
+                                </Typography>
+                                <Stack
+                                    direction={{ xs: 'column', sm: 'row' }}
+                                    spacing={2}
+                                    justifyContent="center"
+                                    alignItems="center" >
+                                    <Button
+                                        variant="contained" size="large" onClick={() => navigate('/register')}
+                                        sx={{
+                                            backgroundColor: 'white', color: theme.palette.primary.main, px: 4, py: 1.5, fontWeight: 'bold', fontSize: '1.1rem',
+                                            '&:hover': {
+                                                backgroundColor: 'rgba(255,255,255,0.9)', transform: 'scale(1.05)',
+                                            }, transition: 'all 0.3s',
+                                        }}
+                                    >
+                                        Sign Up Now - It's Free
+                                    </Button>
+                                    <Button
+                                        variant="outlined" size="large"
+                                        onClick={() => navigate('/login')}
+                                        sx={{
+                                            borderColor: 'white', color: 'white', px: 4, py: 1.5, fontWeight: 'bold',
+                                            '&:hover': {
+                                                backgroundColor: 'rgba(255,255,255,0.1)', borderColor: 'white',
+                                            },
+                                        }}
+                                    >
+                                        Already a Member? Login
+                                    </Button>
+                                </Stack>
+                            </Box>
+                        </Paper>
+                    </Fade>
+                )}
+                {/* Newsletter Section */}
+                <Box sx={{ mt: 8, mb: 4 }}>
                     <Paper
                         sx={{
-                            p: 4, mb: 6, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white', textAlign: 'center',
+                            p: 4, textAlign: 'center', background: 'linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)', border: '2px dashed', borderColor: 'primary.light', borderRadius: 3,
                         }}
                     >
-                        <Typography variant="h4" gutterBottom>
-                            Join Our Platform Today
+                        <EmailIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
+                        <Typography variant="h5" fontWeight="bold" gutterBottom>
+                            Stay Updated
                         </Typography>
-                        <Typography variant="body1" gutterBottom>
-                            Get exclusive deals, business pricing, and more!
+                        <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+                            Subscribe to our newsletter and never miss a deal!
                         </Typography>
-                        <Box sx={{ mt: 3 }}>
+                        <Box
+                            component="form" sx={{
+                                display: 'flex', maxWidth: 500, mx: 'auto', gap: 1, flexDirection: { xs: 'column', sm: 'row' },
+                            }}
+                        >
+                            <TextField
+                                fullWidth
+                                placeholder="Enter your email address" variant="outlined" sx={{ backgroundColor: 'white' }}
+                            />
                             <Button
-                                variant="contained" size="large" onClick={() => navigate('/register')}
-                                sx={{
-                                    backgroundColor: 'white', color: 'primary.main', mr: 2,
-                                    '&:hover': {
-                                        backgroundColor: 'grey.100',
-                                    },
-                                }}
+                                variant="contained" size="large" sx={{ px: 4, whiteSpace: 'nowrap' }}
                             >
-                                Sign Up Now
-                            </Button>
-                            <Button
-                                variant="outlined" size="large" onClick={() => navigate('/login')}
-                                sx={{
-                                    borderColor: 'white', color: 'white',
-                                    '&:hover': {
-                                        borderColor: 'white', backgroundColor: 'rgba(255,255,255,0.1)',
-                                    },
-                                }}
-                            >
-                                Login
+                                Subscribe
                             </Button>
                         </Box>
                     </Paper>
-                )}
-                {/* Newsletter Section */}
-                <Paper sx={{ p: 4, textAlign: 'center', mb: 4 }}>
-                    <Typography variant="h5" gutterBottom>
-                        Subscribe to Our Newsletter
-                    </Typography>
-                    <Box sx={{ maxWidth: 400, mx: 'auto', mt: 3 }}>
-                        <Grid container spacing={1}>
-                            <Grid item xs={8}>
-                                {/* TextField will now work once imported */}
-                                <TextField
-                                    fullWidth
-                                    placeholder="Enter your email"
-                                    variant="outlined"
-                                    size="small"
-                                />
-                            </Grid>
-                            <Grid item xs={4}>
-                                <Button fullWidth variant="contained">
-                                    Subscribe
-                                </Button>
-                            </Grid>
-                        </Grid>
-                    </Box>
-                </Paper>
+                </Box>
             </Container>
         </Box>
     );
