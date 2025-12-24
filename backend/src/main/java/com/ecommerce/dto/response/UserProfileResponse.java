@@ -1,12 +1,17 @@
 package com.ecommerce.dto.response;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserProfileResponse extends UserResponse {
-    private AddressResponse defaultShippingAddress;
-    private AddressResponse defaultBillingAddress;
-    private UserPreferencesResponse preferences;
+
+    private Object defaultShippingAddress;
+    private Object defaultBillingAddress;
+    private Object preferences;
 }

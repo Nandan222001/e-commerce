@@ -1,7 +1,5 @@
 // src/main/java/com/ecommerce/service/OrderService.java
 package com.ecommerce.service;
-import com.ecommerce.repository.AddressRepository;
-import com.ecommerce.repository.CouponRepository;
 import com.ecommerce.service.InventoryService;
 import com.ecommerce.service.InvoiceService;
 import com.ecommerce.service.NotificationService;
@@ -34,6 +32,11 @@ import java.util.stream.Collectors;
 @Transactional
 public class OrderService {
 
+    private final ReturnRequestRepository returnRequestRepository;
+    private final ReviewRepository reviewRepository;
+    private final CouponUsageRepository couponUsageRepository;
+    private final OrderStatusHistoryRepository orderStatusHistoryRepository;
+    private final SmsService smsService;
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final AddressRepository addressRepository;

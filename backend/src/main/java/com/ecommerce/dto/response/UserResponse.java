@@ -1,13 +1,21 @@
 package com.ecommerce.dto.response;
 
 import com.ecommerce.entity.Role;
-import lombok.Builder;
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+
 import java.util.Set;
 
-@Data
-@Builder
+@Getter
+@Setter
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserResponse {
+
     private Long id;
     private String email;
     private String firstName;

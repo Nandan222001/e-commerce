@@ -2,14 +2,16 @@
 package com.ecommerce.service;
 
 import com.ecommerce.dto.response.*;
+import com.ecommerce.entity.SystemSetting;
+import com.ecommerce.entity.Order;
+import com.ecommerce.mapper.OrderMapper;
 import com.ecommerce.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.ecommerce.repository.CategoryRepository;
-import com.ecommerce.repository.SystemSettingsRepository;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -22,12 +24,12 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class AdminService {
 
+    private final OrderMapper orderMapper;
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final SystemSettingsRepository settingsRepository;
-
     public DashboardStatsResponse getDashboardStats() {
         DashboardStatsResponse stats = new DashboardStatsResponse();
 
@@ -83,9 +85,11 @@ public class AdminService {
 
     public List<OrderResponse> getRecentOrders(int limit) {
         List<Order> orders = orderRepository.findRecentOrders(PageRequest.of(0, limit));
+        
+        // Fix for "incompatible types" error
         return orders.stream()
-                .map(orderMapper::toResponse)
-                .collect(Collectors.toList());
+            .map(orderMapper::toResponse) 
+            .collect(Collectors.toList());
     }
 
     public Map<String, Object> getSalesData(String period, LocalDate startDate, LocalDate endDate) {

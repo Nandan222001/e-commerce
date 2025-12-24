@@ -1,6 +1,8 @@
 // src/main/java/com/ecommerce/controller/UserController.java
 package com.ecommerce.controller;
-
+import org.springframework.http.MediaType;
+import org.springframework.http.HttpHeaders;
+import org.springframework.core.io.ByteArrayResource;
 import com.ecommerce.dto.request.*;
 import com.ecommerce.dto.response.*;
 import com.ecommerce.entity.User;

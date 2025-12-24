@@ -38,6 +38,9 @@ import java.util.stream.Collectors;
 @Transactional
 public class ProductService {
 
+    private final UserService userService;
+    private final NotificationService notificationService;
+    private final EmailService emailService;
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final ProductMapper productMapper;

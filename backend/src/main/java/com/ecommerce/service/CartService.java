@@ -8,15 +8,13 @@ import com.ecommerce.dto.response.CartValidationResponse;
 import com.ecommerce.entity.*;
 import com.ecommerce.exception.ResourceNotFoundException;
 import com.ecommerce.mapper.CartMapper;
+import com.ecommerce.mapper.ProductMapper;
 import com.ecommerce.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.ecommerce.repository.CartRepository;
-import com.ecommerce.repository.CartItemRepository;
-import com.ecommerce.repository.CouponRepository;
-import com.ecommerce.repository.SavedItemRepository;
+
 import com.ecommerce.service.RecommendationService;
 import com.ecommerce.dto.response.CartItemResponse;
 import com.ecommerce.dto.response.ProductResponse;
@@ -31,6 +29,9 @@ import java.util.stream.Collectors;
 @Transactional
 public class CartService {
 
+    private final ProductMapper productMapper;
+    private final UserRepository userRepository;
+    private final CouponUsageRepository couponUsageRepository;
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
     private final ProductRepository productRepository;
