@@ -1,9 +1,11 @@
-// src/main/java/com/ecommerce/service/EmailService.java
 package com.ecommerce.service;
 
 import com.ecommerce.entity.Order;
 import com.ecommerce.entity.Product;
 import com.ecommerce.entity.User;
+// CHANGE THESE IMPORTS FROM javax TO jakarta
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,8 +15,6 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
