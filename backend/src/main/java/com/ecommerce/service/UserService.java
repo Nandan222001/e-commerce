@@ -15,7 +15,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
+import com.ecommerce.repository.RoleRepository;
+import com.ecommerce.repository.WishlistRepository;
+import com.ecommerce.repository.ReviewRepository;
+import com.ecommerce.repository.NotificationRepository;
+import com.ecommerce.repository.NotificationPreferencesRepository;
+import com.ecommerce.repository.RecentlyViewedRepository;
+import com.ecommerce.repository.LoyaltyPointsRepository;
+import com.ecommerce.service.FileStorageService;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;

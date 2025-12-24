@@ -1,6 +1,13 @@
 // src/main/java/com/ecommerce/service/OrderService.java
 package com.ecommerce.service;
-
+import com.ecommerce.repository.AddressRepository;
+import com.ecommerce.repository.CouponRepository;
+import com.ecommerce.service.InventoryService;
+import com.ecommerce.service.InvoiceService;
+import com.ecommerce.service.NotificationService;
+import com.ecommerce.service.PaymentService;
+import com.ecommerce.service.ShippingService;
+import com.ecommerce.service.LoyaltyService;
 import com.ecommerce.dto.request.CreateOrderRequest;
 import com.ecommerce.dto.response.OrderResponse;
 import com.ecommerce.dto.response.OrderSummaryResponse;

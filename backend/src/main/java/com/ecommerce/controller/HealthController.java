@@ -28,7 +28,7 @@ public class HealthController implements HealthIndicator {
 
     @GetMapping
     @Operation(summary = "Health check", description = "Check application health status")
-    public ResponseEntity<Map<String, Object>> health() {
+    public ResponseEntity<Map<String, Object>> checkHealth() {
         Map<String, Object> healthStatus = new HashMap<>();
         healthStatus.put("status", "UP");
         healthStatus.put("timestamp", System.currentTimeMillis());

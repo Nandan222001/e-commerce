@@ -13,7 +13,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import com.ecommerce.repository.CartRepository;
+import com.ecommerce.repository.CartItemRepository;
+import com.ecommerce.repository.CouponRepository;
+import com.ecommerce.repository.SavedItemRepository;
+import com.ecommerce.service.RecommendationService;
+import com.ecommerce.dto.response.CartItemResponse;
+import com.ecommerce.dto.response.ProductResponse;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
