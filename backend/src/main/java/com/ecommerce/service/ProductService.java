@@ -48,7 +48,7 @@ public class ProductService {
     private final ElasticsearchService elasticsearchService;
     private final CacheService cacheService;
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public Page<ProductResponse> getAllProducts(Pageable pageable, String category,
             Boolean inStock, User.CustomerType customerType) {
         Specification<Product> spec = Specification.where(isActive());
@@ -73,7 +73,7 @@ public class ProductService {
     }
 
     @Cacheable(value = "products", key = "#id + '_' + #customerType")
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public ProductResponse getProductById(Long id, User.CustomerType customerType) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
@@ -89,7 +89,7 @@ public class ProductService {
         return response;
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public Page<ProductResponse> searchProducts(ProductSearchRequest searchRequest,
             User.CustomerType customerType,
             Pageable pageable) {
@@ -219,7 +219,7 @@ public class ProductService {
         return productMapper.toResponse(product);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public List<ProductResponse> getFeaturedProducts(int limit, User.CustomerType customerType) {
         List<Product> products = productRepository.findFeaturedProducts(
                 PageRequest.of(0, limit, Sort.by("createdAt").descending()));
@@ -233,7 +233,7 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public List<ProductResponse> getNewArrivals(int limit, User.CustomerType customerType) {
         LocalDateTime thirtyDaysAgo = LocalDateTime.now().minusDays(30);
 
@@ -251,7 +251,7 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public List<ProductResponse> getBestSellers(int limit, User.CustomerType customerType) {
         List<Product> products = productRepository.findBestSellers(
                 PageRequest.of(0, limit));
@@ -266,7 +266,7 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public Page<ProductResponse> getProductsByCategory(Long categoryId,
             User.CustomerType customerType,
             Pageable pageable) {
@@ -279,7 +279,7 @@ public class ProductService {
         });
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public List<ProductResponse> getRelatedProducts(Long productId, int limit,
             User.CustomerType customerType) {
         Product product = productRepository.findById(productId)
@@ -353,7 +353,7 @@ public class ProductService {
         return imageUrls;
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public Map<String, Object> getAvailableFilters() {
         Map<String, Object> filters = new HashMap<>();
 
@@ -372,7 +372,7 @@ public class ProductService {
         return filters;
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public Map<String, Double> getPriceRange(String category) {
         BigDecimal minPrice;
         BigDecimal maxPrice;
@@ -401,7 +401,7 @@ public class ProductService {
         }
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public boolean checkAvailability(Long productId, int quantity) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
@@ -409,7 +409,7 @@ public class ProductService {
         return product.getStockQuantity() >= quantity;
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public int getAvailableStock(Long productId) {
         return productRepository.findById(productId)
                 .map(Product::getStockQuantity)

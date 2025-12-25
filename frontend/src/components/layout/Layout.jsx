@@ -38,7 +38,7 @@ const Layout = () => {
           sx={{
             flexGrow: 1,
             p: 3,
-            ml: showSidebar && !isMobile ? '240px' : 0,
+            ml: showSidebar && !isMobile ? '0px' : 0,
             transition: theme.transitions.create('margin', {
               easing: theme.transitions.easing.sharp,
               duration: theme.transitions.duration.leavingScreen,

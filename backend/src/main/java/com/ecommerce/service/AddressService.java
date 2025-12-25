@@ -28,7 +28,7 @@ public class AddressService {
     private final UserRepository userRepository;
     private final AddressMapper addressMapper;
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public List<AddressResponse> getUserAddresses(Long userId) {
         List<Address> addresses = addressRepository.findByUserId(userId);
         return addresses.stream()

@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@Transactional(readOnly = true)
+@Transactional(readOnly = false)
 public class AdminService {
 
     private final OrderMapper orderMapper;

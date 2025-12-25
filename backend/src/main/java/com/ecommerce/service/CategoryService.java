@@ -25,7 +25,7 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public List<CategoryResponse> getAllCategories() {
         List<Category> categories = categoryRepository.findAll();
         return categories.stream()
@@ -33,14 +33,14 @@ public class CategoryService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public CategoryResponse getCategoryById(Long id) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
         return categoryMapper.toResponse(category);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public List<CategoryResponse> getCategoryTree() {
         List<Category> rootCategories = categoryRepository.findByParentIdIsNull();
         return rootCategories.stream()

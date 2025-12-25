@@ -315,7 +315,7 @@ public class CartService {
         return getCart(userId);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public Map<String, Object> getCartSummary(Long userId) {
         Cart cart = cartRepository.findByUserId(userId)
                 .orElseGet(() -> createNewCart(userId));
@@ -385,7 +385,7 @@ public class CartService {
         return cartResponse;
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public List<CartItemResponse> getSavedItems(Long userId) {
         List<SavedItem> savedItems = savedItemRepository.findByUserId(userId);
 
@@ -400,7 +400,7 @@ public class CartService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public List<ProductResponse> getRecommendations(Long userId) {
         Cart cart = cartRepository.findByUserId(userId)
                 .orElse(null);

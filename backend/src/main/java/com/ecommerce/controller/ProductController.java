@@ -80,6 +80,7 @@ public class ProductController {
         }
 
         ProductResponse product = productService.getProductById(id, customerType);
+        
         return ResponseEntity.ok(product);
     }
 

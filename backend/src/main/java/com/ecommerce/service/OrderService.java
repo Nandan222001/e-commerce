@@ -211,7 +211,7 @@ public class OrderService {
         return orderMapper.toResponse(order);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public Page<OrderResponse> getUserOrders(Long userId, String status, Pageable pageable) {
         Page<Order> orders;
 
@@ -225,7 +225,7 @@ public class OrderService {
         return orders.map(orderMapper::toResponse);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public Page<OrderResponse> getAllOrders(String status, String search, Pageable pageable) {
         Page<Order> orders;
 
@@ -241,7 +241,7 @@ public class OrderService {
         return orders.map(orderMapper::toResponse);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public OrderResponse getOrderDetails(Long orderId, User user) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
@@ -371,7 +371,7 @@ public class OrderService {
         return orderMapper.toResponse(order);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public Map<String, Object> getOrderTracking(Long orderId, User user) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
@@ -457,7 +457,7 @@ public class OrderService {
         return response;
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public OrderSummaryResponse getUserOrderSummary(Long userId) {
         OrderSummaryResponse summary = new OrderSummaryResponse();
 
@@ -500,7 +500,7 @@ public class OrderService {
         log.info("Review added for order: {}", order.getOrderNumber());
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public Map<String, Object> calculateShipping(Map<String, Object> shippingDetails) {
         String postalCode = (String) shippingDetails.get("postalCode");
         BigDecimal orderValue = new BigDecimal(shippingDetails.get("orderValue").toString());
@@ -522,7 +522,7 @@ public class OrderService {
         return shippingInfo;
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public Map<String, Object> validateCoupon(String couponCode, User user) {
         Coupon coupon = couponRepository.findByCode(couponCode)
                 .orElseThrow(() -> new ResourceNotFoundException("Invalid coupon code"));

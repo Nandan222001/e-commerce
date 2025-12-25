@@ -29,7 +29,7 @@ public class InventoryService {
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public Page<InventoryResponse> getInventory(String search, Boolean lowStock, Pageable pageable) {
         // Simplified logic: Assuming ProductRepository has findAll or appropriate query
         Page<Product> products = productRepository.findAll(pageable);
@@ -47,7 +47,7 @@ public class InventoryService {
         });
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public InventoryStatsResponse getInventoryStats() {
         InventoryStatsResponse stats = new InventoryStatsResponse();
         stats.setTotalProducts(productRepository.count());
@@ -58,7 +58,7 @@ public class InventoryService {
         return stats;
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public List<InventoryResponse> getLowStockItems() {
         // This query needs to be implemented in repository or filtered in code
         // For simplicity returning empty
