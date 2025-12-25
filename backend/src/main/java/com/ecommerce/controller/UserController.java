@@ -1,5 +1,6 @@
-// src/main/java/com/ecommerce/controller/UserController.java
 package com.ecommerce.controller;
+
+// src/main/java/com/ecommerce/controller/UserController.java
 import org.springframework.http.MediaType;
 import org.springframework.http.HttpHeaders;
 import org.springframework.core.io.ByteArrayResource;
@@ -24,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/users")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Users", description = "User management APIs")

@@ -1,61 +1,93 @@
 spring:
   application:
     name: ecommerce-platform
-  
+
   datasource:
     url: jdbc:mysql://localhost:3306/ecommerce_db?useSSL=false&serverTimezone=UTC
-    username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:password}
+    username: ${DB_USERNAME:phpmyadmin}
+    password: ${DB_PASSWORD:phpmyadmin}
     driver-class-name: com.mysql.cj.jdbc.Driver
-    
+
   jpa:
     hibernate:
       ddl-auto: validate
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
+        dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
     show-sql: false
-    
+
   flyway:
     enabled: true
     baseline-on-migrate: true
     locations: classpath:db/migration
-    
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: singhnandan.2814@gmail.com
+    password: "izok rnte cilb zqka"
+    from: singhnandan.2814@gmail.com
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+  thymeleaf:
+    check-template-location: false
+
 security:
   jwt:
     secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
-    expiration: 86400000 # 24 hours
-    refresh-expiration: 604800000 # 7 days
-    
+    expiration: 86400000
+    refresh-expiration: 604800000
+
 server:
   port: 8080
-  servlet:
-    context-path: /api
-    
+  # servlet:
+  #   context-path: /api
+
 logging:
   level:
     com.ecommerce: DEBUG
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
-    
+
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
-        
+        include:
+          - health
+          - info
+          - metrics
+
 app:
+  name: Ecommerce Platform
+
+  frontend:
+    url: http://localhost:3000   # ✅ FIXED (THIS WAS THE CRASH)
+
   gst:
-    rate: 18 # GST rate in percentage
+    rate: 18
     cgst: 9
     sgst: 9
     igst: 18
-  
+
   cors:
-    allowed-origins: http://localhost:3000
-    allowed-methods: GET,POST,PUT,DELETE,OPTIONS
-    allowed-headers: "*"
-    exposed-headers: Authorization
-    allow-credentials: true
+    allowed-origins:
+      - http://localhost:3000
+    allowed-methods:
+      - GET
+      - POST
+      - PUT
+      - DELETE
+      - OPTIONS
+    allowed-headers:
+      - "*"
     max-age: 3600
+
+file:
+  upload-dir: uploads

@@ -17,53 +17,57 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class Product extends BaseEntity {
 
-    @Column(nullable = false)
-    private String name;
+@Column(nullable = false)
+private String name;
 
-    @Column(unique = true, nullable = false)
-    private String sku;
+@Column(unique = true, nullable = false)
+private String sku;
 
-    @Column(columnDefinition = "TEXT")
-    private String description;
+@Column(columnDefinition = "TEXT")
+private String description;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id")
-    private Category category;
+@ManyToOne
+@JoinColumn(name = "category_id")
+private Category category;
 
-    @Column(nullable = false)
-    private BigDecimal basePrice;
+@OneToMany(mappedBy = "product")
+private Set<OrderItem> orderItems = new HashSet<>();
 
-    private BigDecimal businessPrice;
+@Column(nullable = false)
+private BigDecimal basePrice;
 
-    private Integer stockQuantity;
-    private Integer minStockLevel;
+private BigDecimal businessPrice;
 
-    private Boolean active = true;
-    private Boolean gstApplicable = true;
-    private BigDecimal gstRate;
+private Integer stockQuantity;
+private Integer minStockLevel;
 
-    private String unit;
-    private String brand;
-    private String manufacturer;
-    private String partNumber;
+private Boolean active = true;
+private Boolean gstApplicable = true;
+private BigDecimal gstRate;
 
-    @ElementCollection
-    @CollectionTable(name = "product_images", joinColumns = @JoinColumn(name = "product_id"))
-    @Column(name = "image_url")
-    private Set<String> imageUrls = new HashSet<>();
+private String unit;
+private String brand;
+private String manufacturer;
+private String partNumber;
 
-    // Statistics
-    private Long viewCount = 0L;
-    private Double averageRating = 0.0;
-    private Integer totalReviews = 0;
+@ElementCollection
+@CollectionTable(name = "product_images", joinColumns = @JoinColumn(name = "product_id"))
+@Column(name = "image_url")
+private Set<String> imageUrls = new HashSet<>();
 
-    private LocalDateTime deletedAt; // For soft delete
+// Statistics
+private Long viewCount = 0L;
+private Double averageRating = 0.0;
+private Integer totalReviews = 0;
 
-    @ManyToOne
-    @JoinColumn(name = "created_by")
-    private User createdBy;
+private LocalDateTime deletedAt; // For soft delete
 
-    @ManyToOne
-    @JoinColumn(name = "updated_by")
-    private User updatedBy;
+@ManyToOne
+@JoinColumn(name = "created_by")
+private User createdBy;
+
+@ManyToOne
+@JoinColumn(name = "updated_by")
+private User updatedBy;
+
 }

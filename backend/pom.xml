@@ -132,13 +132,36 @@
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+
     </dependencies>
 
         <build>
         <plugins>
+        <plugin>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-maven-plugin</artifactId>
+            <version>9.16.3</version>
+            <configuration>
+                <url>jdbc:mysql://localhost:3306/ecommerce_db</url>
+                <user>phpmyadmin</user>
+                <password>phpmyadmin</password>
+                <locations>
+                    <location>classpath:db/migration</location>
+                </locations>
+            </configuration>
+        </plugin>
+
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>3.1.5</version>
+                <configuration>
+                    <mainClass>com.ecommerce.EcommercePlatformApplication</mainClass>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
