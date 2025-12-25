@@ -8,7 +8,6 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { Toaster } from 'react-hot-toast';
 import { HelmetProvider } from 'react-helmet-async';
-import AdminLayout from './components/layout/AdminLayout'; 
 
 import { store } from './store';
 import { theme } from './styles/theme';
@@ -87,15 +86,11 @@ function App() {
                           
                           {/* Admin Routes */}
                           <Route path="admin" element={<PrivateRoute roles={['ADMIN']} />}>
-                            {/* Wrap admin routes in AdminLayout */}
-                            <Route element={<AdminLayout />}>
-                              <Route index element={<AdminDashboard />} />
-                              <Route path="products" element={<AdminProducts />} />
-                              <Route path="orders" element={<AdminOrders />} />
-                              <Route path="users" element={<AdminUsers />} />
-                              <Route path="inventory" element={<AdminInventory />} />
-                              {/* ... other admin routes */}
-                            </Route>
+                            <Route index element={<AdminDashboard />} />
+                            <Route path="products" element={<AdminProducts />} />
+                            <Route path="orders" element={<AdminOrders />} />
+                            <Route path="users" element={<AdminUsers />} />
+                            <Route path="inventory" element={<AdminInventory />} />
                           </Route>
                           
                           {/* Finance Routes */}
