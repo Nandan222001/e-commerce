@@ -38,13 +38,33 @@ const HomePage = () => {
     );
     const banners = [
         {
-            id: 1, image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600', gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', title: 'Mega Sale Event', subtitle: 'Up to 70% Off on Electronics', description: 'Limited time offer on selected items', buttonText: 'Shop Now',
+            id: 1,
+            image: 'https://images.unsplash.com/photo-1498049794561-7780e7231661?w=1600',            title: 'Mega Sale Event',
+            subtitle: 'Up to 70% Off on Electronics',
+            description: 'Limited time offer on selected items',
+            buttonText: 'Shop Now',
             link: '/products?category=electronics',
-        }, {
-            id: 2, image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1600', gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', title: 'Business Solutions', subtitle: 'Exclusive B2B Pricing', description: 'Register as business customer for special rates', buttonText: 'Learn More', link: '/business',
-        }, {
-            id: 3, image: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1600', gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', title: 'New Arrivals', subtitle: 'Latest Products Added', description: 'Be the first to explore new items', buttonText: 'Explore', link: '/products?sort=newest',
-        },];
+        },
+        {
+            id: 2,
+            image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1600',
+            title: 'Business Solutions',
+            subtitle: 'Exclusive B2B Pricing',
+            description: 'Register as business customer for special rates',
+            buttonText: 'Learn More',
+            link: '/business',
+        },
+        {
+            id: 3,
+            image: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1600',
+            title: 'New Arrivals',
+            subtitle: 'Latest Products Added',
+            description: 'Be the first to explore new items',
+            buttonText: 'Explore',
+            link: '/products?sort=newest',
+        },
+    ];
+
     const features = [
         {
             icon: <ShippingIcon sx={{ fontSize: 40 }} />, title: 'Free Shipping', description: 'On orders above ₹500', color: '#4CAF50', bgColor: 'rgba(76, 175, 80, 0.1)',
@@ -82,7 +102,7 @@ const HomePage = () => {
                         <Box
                             key={banner.id}
                             sx={{
-                                height: { xs: 400, sm: 500, md: 600 }, position: 'relative', display: 'flex', alignItems: 'center', backgroundImage: `${banner.gradient}, url(${banner.image})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundBlendMode: 'overlay',
+                                height: { xs: 400, sm: 500, md: 600 }, position: 'relative', display: 'flex', alignItems: 'center', backgroundImage: `url(${banner.image})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundBlendMode: 'overlay',
                             }}
                         >
                             <Container maxWidth="lg">
@@ -97,19 +117,20 @@ const HomePage = () => {
                                                 />
                                                 <Typography
                                                     variant={isMobile ? 'h3' : 'h2'}
-                                                    component="h1" fontWeight="bold" gutterBottom
+                                                    component="h1" fontWeight="bold" color="white" gutterBottom
                                                 >
                                                     {banner.title}
                                                 </Typography>
                                                 <Typography
                                                     variant={isMobile ? 'h5' : 'h4'}
                                                     gutterBottom
-                                                    sx={{ opacity: 0.95 }}
+                                                    sx={{ opacity: 1 }}
+                                                    color="white"
                                                 >
                                                     {banner.subtitle}
                                                 </Typography>
                                                 <Typography
-                                                    variant="body1" sx={{ mb: 3, opacity: 0.9 }}
+                                                    variant="body1" sx={{ mb: 3, opacity: 1 }} color="white"
                                                 >
                                                     {banner.description}
                                                 </Typography>
@@ -514,7 +535,7 @@ const HomePage = () => {
                                 <Typography variant={isMobile ? 'h4' : 'h3'} fontWeight="bold" gutterBottom>
                                     Join Our Platform Today
                                 </Typography>
-                                <Typography variant="h6" sx={{ mb: 4, opacity: 0.95 }}>
+                                <Typography variant="h6" sx={{ mb: 4, opacity: 1 }}>
                                     Get exclusive deals, business pricing, and member benefits!
                                 </Typography>
                                 <Stack

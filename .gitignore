@@ -1,1 +1,3 @@
-/nodemodules
+frontend/node_modules/
+# or
+node_modules/
