@@ -22,9 +22,13 @@ public class CartItem extends BaseEntity {
 
     private Integer quantity;
 
-    // To track price changes
+    // ✅ Persisted snapshot price
+    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal priceAtTimeOfAdding;
 
+    // ✅ FIX: expose persisted price safely
     @Transient
-    private BigDecimal currentPrice;
+    public BigDecimal getCurrentPrice() {
+        return priceAtTimeOfAdding;
+    }
 }
