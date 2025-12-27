@@ -1,7 +1,6 @@
 package com.ecommerce.entity;
 
 import com.ecommerce.entity.Order.OrderStatus;
-
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,11 +16,17 @@ public class OrderStatusHistory extends BaseEntity {
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
+    // ✅ REQUIRED by DB (NOT NULL)
     @Enumerated(EnumType.STRING)
-    private Order.OrderStatus fromStatus;
+    @Column(nullable = false)
+    private OrderStatus status;
+
+    // Optional audit fields
+    @Enumerated(EnumType.STRING)
+    private OrderStatus fromStatus;
 
     @Enumerated(EnumType.STRING)
-    private Order.OrderStatus toStatus;
-    private OrderStatus status;
+    private OrderStatus toStatus;
+
     private String notes;
 }

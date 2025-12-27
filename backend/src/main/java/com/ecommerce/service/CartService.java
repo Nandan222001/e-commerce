@@ -509,7 +509,8 @@ cartItem.setCreatedAt(LocalDateTime.now());
     private void updateCartPrices(Cart cart) {
         for (CartItem item : cart.getItems()) {
             BigDecimal currentPrice = getProductPrice(item.getProduct(), cart.getUser());
-            item.setCurrentPrice(currentPrice);
+            item.setPriceAtTimeOfAdding(currentPrice); // ✅
+
         }
     }
 
