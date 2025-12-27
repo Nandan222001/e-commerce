@@ -152,3 +152,30 @@ mvn flyway:migrate
 # Start the application
 mvn spring-boot:run
 ```
+POST :- http://localhost:8080/addresses
+
+Payload:-
+{
+  "addressLine1": "Flat 101",
+  "addressLine2": "MG Road",
+  "city": "Pune",
+  "state": "Maharashtra",
+  "postalCode": "411001",
+  "country": "India",
+  "default": true
+}
+
+Response:-
+{
+    "id": 3,
+    "addressLine1": "Flat 101",
+    "addressLine2": "MG Road",
+    "city": "Pune",
+    "state": "Maharashtra",
+    "country": "India",
+    "postalCode": "411001",
+    "type": null,
+    "default": true
+}
+
+http://localhost:8080/api/products?page=0&size=10 This also working and no changes need.

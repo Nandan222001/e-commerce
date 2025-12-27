@@ -70,4 +70,13 @@ private User createdBy;
 @JoinColumn(name = "updated_by")
 private User updatedBy;
 
+@Transient
+public BigDecimal getEffectivePrice() {
+    if (businessPrice != null) {
+        return businessPrice;
+    }
+    return basePrice;
+}
+
+
 }
