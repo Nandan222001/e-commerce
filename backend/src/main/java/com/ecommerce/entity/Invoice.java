@@ -23,25 +23,60 @@ public class Invoice extends BaseEntity {
     private LocalDate invoiceDate;
     private LocalDate dueDate;
 
-    private BigDecimal subtotal;
-    private BigDecimal cgstAmount;
-    private BigDecimal sgstAmount;
-    private BigDecimal igstAmount;
-    private BigDecimal totalTax;
-    private BigDecimal shippingCharge;
-    private BigDecimal discount;
-    private BigDecimal totalAmount;
+    @Column(nullable = false)
+    private BigDecimal subtotal = BigDecimal.ZERO;
 
-    private BigDecimal paidAmount;
-    private BigDecimal balanceAmount;
+    @Column(nullable = false)
+    private BigDecimal cgstAmount = BigDecimal.ZERO;
+
+    @Column(nullable = false)
+    private BigDecimal sgstAmount = BigDecimal.ZERO;
+
+    @Column(nullable = false)
+    private BigDecimal igstAmount = BigDecimal.ZERO;
+
+    @Column(nullable = false)
+    private BigDecimal totalTax = BigDecimal.ZERO;
+
+    @Column(nullable = false)
+    private BigDecimal shippingCharge = BigDecimal.ZERO;
+
+    @Column(nullable = false)
+    private BigDecimal discount = BigDecimal.ZERO;
+
+    @Column(nullable = false)
+    private BigDecimal totalAmount = BigDecimal.ZERO;
+
+    @Column(nullable = false)
+    private BigDecimal paidAmount = BigDecimal.ZERO;
+
+    @Column(nullable = false)
+    private BigDecimal balanceAmount = BigDecimal.ZERO;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private InvoiceStatus status;
 
     private String pdfUrl;
     private String notes;
 
     public enum InvoiceStatus {
-        DRAFT, SENT, PAID, PARTIALLY_PAID, OVERDUE, CANCELLED
+        DRAFT,
+        SENT,
+        PAID,
+        PARTIALLY_PAID,
+        OVERDUE,
+        CANCELLED
+    }
+
+    /* =========================
+       Derived value protection
+       ========================= */
+    @PrePersist
+    @PreUpdate
+    private void calculateBalance() {
+        if (totalAmount == null) totalAmount = BigDecimal.ZERO;
+        if (paidAmount == null) paidAmount = BigDecimal.ZERO;
+        this.balanceAmount = totalAmount.subtract(paidAmount);
     }
 }

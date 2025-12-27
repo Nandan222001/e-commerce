@@ -51,56 +51,126 @@ public class CartService {
         return cartMapper.toResponse(cart);
     }
 
+    // public CartResponse addToCart(Long userId, AddToCartRequest request) {
+    //     Cart cart = cartRepository.findByUserId(userId)
+    //             .orElseGet(() -> createNewCart(userId));
+
+    //     Product product = productRepository.findById(request.getProductId())
+    //             .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+
+    //     // Check stock availability
+    //     if (!productService.checkAvailability(product.getId(), request.getQuantity())) {
+    //         throw new RuntimeException("Insufficient stock for product: " + product.getName());
+    //     }
+
+    //     // Check if product already in cart
+    //     Optional<CartItem> existingItem = cart.getItems().stream()
+    //             .filter(item -> item.getProduct().getId().equals(request.getProductId()))
+    //             .findFirst();
+
+    //     if (existingItem.isPresent()) {
+    //         // Update quantity
+    //         CartItem item = existingItem.get();
+    //         int newQuantity = item.getQuantity() + request.getQuantity();
+
+    //         // Check stock for combined quantity
+    //         if (!productService.checkAvailability(product.getId(), newQuantity)) {
+    //             throw new RuntimeException("Cannot add more. Stock limit reached");
+    //         }
+
+    //         item.setQuantity(newQuantity);
+    //         item.setUpdatedAt(LocalDateTime.now());
+    //     } else {
+    //         // Add new item
+    //         CartItem cartItem = new CartItem();
+    //         cartItem.setCart(cart);
+    //         cartItem.setProduct(product);
+    //         cartItem.setQuantity(request.getQuantity());
+    //         cartItem.setCreatedAt(LocalDateTime.now());
+
+    //         cart.getItems().add(cartItem);
+    //     }
+
+    //     cart.setUpdatedAt(LocalDateTime.now());
+    //     cart = cartRepository.save(cart);
+
+    //     // Update cart totals
+    //     updateCartTotals(cart);
+
+    //     log.info("Product {} added to cart for user {}", request.getProductId(), userId);
+
+    //     return cartMapper.toResponse(cart);
+    // }
+    
+
     public CartResponse addToCart(Long userId, AddToCartRequest request) {
-        Cart cart = cartRepository.findByUserId(userId)
-                .orElseGet(() -> createNewCart(userId));
 
-        Product product = productRepository.findById(request.getProductId())
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+    Cart cart = cartRepository.findByUserId(userId)
+            .orElseGet(() -> createNewCart(userId));
 
-        // Check stock availability
-        if (!productService.checkAvailability(product.getId(), request.getQuantity())) {
-            throw new RuntimeException("Insufficient stock for product: " + product.getName());
-        }
+    Product product = productRepository.findById(request.getProductId())
+            .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
-        // Check if product already in cart
-        Optional<CartItem> existingItem = cart.getItems().stream()
-                .filter(item -> item.getProduct().getId().equals(request.getProductId()))
-                .findFirst();
-
-        if (existingItem.isPresent()) {
-            // Update quantity
-            CartItem item = existingItem.get();
-            int newQuantity = item.getQuantity() + request.getQuantity();
-
-            // Check stock for combined quantity
-            if (!productService.checkAvailability(product.getId(), newQuantity)) {
-                throw new RuntimeException("Cannot add more. Stock limit reached");
-            }
-
-            item.setQuantity(newQuantity);
-            item.setUpdatedAt(LocalDateTime.now());
-        } else {
-            // Add new item
-            CartItem cartItem = new CartItem();
-            cartItem.setCart(cart);
-            cartItem.setProduct(product);
-            cartItem.setQuantity(request.getQuantity());
-            cartItem.setCreatedAt(LocalDateTime.now());
-
-            cart.getItems().add(cartItem);
-        }
-
-        cart.setUpdatedAt(LocalDateTime.now());
-        cart = cartRepository.save(cart);
-
-        // Update cart totals
-        updateCartTotals(cart);
-
-        log.info("Product {} added to cart for user {}", request.getProductId(), userId);
-
-        return cartMapper.toResponse(cart);
+    // Check stock availability
+    if (!productService.checkAvailability(product.getId(), request.getQuantity())) {
+        throw new RuntimeException("Insufficient stock for product: " + product.getName());
     }
+
+    Optional<CartItem> existingItem = cart.getItems().stream()
+            .filter(item -> item.getProduct().getId().equals(request.getProductId()))
+            .findFirst();
+
+    if (existingItem.isPresent()) {
+
+        CartItem item = existingItem.get();
+        int newQuantity = item.getQuantity() + request.getQuantity();
+
+        if (!productService.checkAvailability(product.getId(), newQuantity)) {
+            throw new RuntimeException("Cannot add more. Stock limit reached");
+        }
+
+        item.setQuantity(newQuantity);
+
+        // ✅ ENSURE PRICE IS NEVER NULL
+        if (item.getPriceAtTimeOfAdding() == null) {
+            item.setPriceAtTimeOfAdding(product.getEffectivePrice());
+        }
+
+        item.setUpdatedAt(LocalDateTime.now());
+
+    } else {
+
+        // CartItem cartItem = new CartItem();
+        // cartItem.setCart(cart);
+        // cartItem.setProduct(product);
+        // cartItem.setQuantity(request.getQuantity());
+
+        // // ✅ THIS IS THE FIX (MANDATORY)
+        // cartItem.setPriceAtTimeOfAdding(product.getEffectivePrice());
+
+        // cartItem.setCreatedAt(LocalDateTime.now());
+        CartItem cartItem = new CartItem();
+cartItem.setCart(cart);
+cartItem.setProduct(product);
+cartItem.setQuantity(request.getQuantity());
+cartItem.setPriceAtTimeOfAdding(product.getEffectivePrice());
+cartItem.setCreatedAt(LocalDateTime.now());
+
+        cart.getItems().add(cartItem);
+    }
+
+    cart.setUpdatedAt(LocalDateTime.now());
+
+    // Save first
+    cart = cartRepository.save(cart);
+
+    // Then calculate totals
+    updateCartTotals(cart);
+
+    log.info("Product {} added to cart for user {}", request.getProductId(), userId);
+
+    return cartMapper.toResponse(cart);
+}
 
     public CartResponse updateCartItem(Long userId, Long itemId, UpdateCartItemRequest request) {
         Cart cart = cartRepository.findByUserId(userId)
@@ -439,7 +509,8 @@ public class CartService {
     private void updateCartPrices(Cart cart) {
         for (CartItem item : cart.getItems()) {
             BigDecimal currentPrice = getProductPrice(item.getProduct(), cart.getUser());
-            item.setCurrentPrice(currentPrice);
+            item.setPriceAtTimeOfAdding(currentPrice); // ✅
+
         }
     }
 
