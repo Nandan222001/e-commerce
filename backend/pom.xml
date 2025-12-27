@@ -147,8 +147,8 @@
             <version>9.16.3</version>
             <configuration>
                 <url>jdbc:mysql://localhost:3306/ecommerce_db</url>
-                <user>phpmyadmin</user>
-                <password>phpmyadmin</password>
+                <user>root</user>
+                <password></password>
                 <locations>
                     <location>classpath:db/migration</location>
                 </locations>

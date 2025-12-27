@@ -14,13 +14,11 @@ import {
   Avatar,
   Tooltip,
   InputBase,
-  Paper,
   Divider,
 } from '@mui/material';
 import {
   Menu as MenuIcon,
   ShoppingCart as CartIcon,
-  AccountCircle as AccountIcon,
   Notifications as NotificationIcon,
   Search as SearchIcon,
   Logout as LogoutIcon,
@@ -28,23 +26,24 @@ import {
   Dashboard as DashboardIcon,
   Receipt as ReceiptIcon,
 } from '@mui/icons-material';
-import { styled, alpha } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import { logout, selectCurrentUser, selectIsAuthenticated } from '../../store/slices/authSlice';
 import { selectCartItemsCount } from '../../store/slices/cartSlice';
 
+/* =======================
+   Styled Components
+======================= */
+
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
-  borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.common.white, 0.15),
-  '&:hover': {
-    backgroundColor: alpha(theme.palette.common.white, 0.25),
-  },
-  marginRight: theme.spacing(2),
-  marginLeft: 0,
+  borderRadius: 999,
+  backgroundColor: 'rgba(255,255,255,0.12)',
+  border: '1px solid rgba(255,255,255,0.18)',
+  marginLeft: theme.spacing(3),
   width: '100%',
-  [theme.breakpoints.up('sm')]: {
-    marginLeft: theme.spacing(3),
-    width: 'auto',
+  maxWidth: 420,
+  '&:hover': {
+    backgroundColor: 'rgba(255,255,255,0.18)',
   },
 }));
 
@@ -56,23 +55,24 @@ const SearchIconWrapper = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
+  color: 'rgba(255,255,255,0.8)',
 }));
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: 'inherit',
+  color: '#fff',
+  width: '100%',
   '& .MuiInputBase-input': {
-    padding: theme.spacing(1, 1, 1, 0),
+    padding: theme.spacing(1.2, 1, 1.2, 0),
     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-    transition: theme.transitions.create('width'),
-    width: '100%',
-    [theme.breakpoints.up('md')]: {
-      width: '20ch',
-      '&:focus': {
-        width: '30ch',
-      },
+    '&::placeholder': {
+      color: 'rgba(255,255,255,0.7)',
     },
   },
 }));
+
+/* =======================
+   Component
+======================= */
 
 const Header = ({ onMenuClick, showMenuButton }) => {
   const navigate = useNavigate();
@@ -80,30 +80,14 @@ const Header = ({ onMenuClick, showMenuButton }) => {
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const user = useSelector(selectCurrentUser);
   const cartItemsCount = useSelector(selectCartItemsCount);
-  
+
   const [anchorEl, setAnchorEl] = useState(null);
   const [notificationAnchor, setNotificationAnchor] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const handleProfileMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleNotificationClick = (event) => {
-    setNotificationAnchor(event.currentTarget);
-  };
-
-  const handleNotificationClose = () => {
-    setNotificationAnchor(null);
-  };
-
   const handleLogout = async () => {
     await dispatch(logout());
-    handleMenuClose();
+    setAnchorEl(null);
     navigate('/');
   };
 
@@ -114,38 +98,48 @@ const Header = ({ onMenuClick, showMenuButton }) => {
     }
   };
 
-  const isMenuOpen = Boolean(anchorEl);
-
   return (
-    <AppBar position="sticky" elevation={1}>
-      <Toolbar>
+    <AppBar
+      position="sticky"
+      elevation={0}
+      sx={{
+        background: 'linear-gradient(135deg, #0f172a, #1e1b4b)',
+        borderBottom: '1px solid rgba(255,255,255,0.08)',
+      }}
+    >
+      <Toolbar sx={{ minHeight: 72, px: { xs: 2, md: 4 } }}>
         {showMenuButton && (
           <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
             onClick={onMenuClick}
-            sx={{ mr: 2 }}
+            sx={{
+              mr: 2,
+              color: '#fff',
+              backgroundColor: 'rgba(255,255,255,0.08)',
+              '&:hover': { backgroundColor: 'rgba(255,255,255,0.16)' },
+            }}
           >
             <MenuIcon />
           </IconButton>
         )}
 
+        {/* Brand */}
         <Typography
-          variant="h6"
-          noWrap
           component={Link}
           to="/"
           sx={{
-            display: { xs: 'none', sm: 'block' },
             textDecoration: 'none',
-            color: 'inherit',
-            fontWeight: 'bold',
+            fontWeight: 800,
+            fontSize: '1.25rem',
+            letterSpacing: '-0.5px',
+            background: 'linear-gradient(90deg, #60a5fa, #a78bfa)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
           }}
         >
-          E-Commerce Platform
+          Lumina
         </Typography>
 
+        {/* Search */}
         <Search>
           <SearchIconWrapper>
             <SearchIcon />
@@ -153,7 +147,6 @@ const Header = ({ onMenuClick, showMenuButton }) => {
           <form onSubmit={handleSearch}>
             <StyledInputBase
               placeholder="Search products…"
-              inputProps={{ 'aria-label': 'search' }}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -162,85 +155,95 @@ const Header = ({ onMenuClick, showMenuButton }) => {
 
         <Box sx={{ flexGrow: 1 }} />
 
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          {isAuthenticated ? (
-            <>
-              <Tooltip title="Cart">
-                <IconButton
-                  color="inherit"
-                  onClick={() => navigate('/cart')}
-                >
-                  <Badge badgeContent={cartItemsCount} color="error">
-                    <CartIcon />
-                  </Badge>
-                </IconButton>
-              </Tooltip>
-
-              <Tooltip title="Notifications">
-                <IconButton
-                  color="inherit"
-                  onClick={handleNotificationClick}
-                >
-                  <Badge badgeContent={3} color="error">
-                    <NotificationIcon />
-                  </Badge>
-                </IconButton>
-              </Tooltip>
-
-              <Tooltip title="Account">
-                <IconButton
-                  edge="end"
-                  aria-label="account of current user"
-                  aria-controls="primary-search-account-menu"
-                  aria-haspopup="true"
-                  onClick={handleProfileMenuOpen}
-                  color="inherit"
-                >
-                  <Avatar
-                    sx={{ width: 32, height: 32 }}
-                    src={user?.avatar}
-                  >
-                    {user?.firstName?.[0]}{user?.lastName?.[0]}
-                  </Avatar>
-                </IconButton>
-              </Tooltip>
-            </>
-          ) : (
-            <>
-              <Button color="inherit" onClick={() => navigate('/login')}>
-                Login
-              </Button>
-              <Button
-                color="inherit"
-                variant="outlined"
-                onClick={() => navigate('/register')}
-                sx={{ borderColor: 'white' }}
+        {/* Right Actions */}
+        {isAuthenticated ? (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Tooltip title="Cart">
+              <IconButton
+                onClick={() => navigate('/cart')}
+                sx={{
+                  color: '#fff',
+                  backgroundColor: 'rgba(255,255,255,0.08)',
+                }}
               >
-                Sign Up
-              </Button>
-            </>
-          )}
-        </Box>
+                <Badge badgeContent={cartItemsCount} color="error">
+                  <CartIcon />
+                </Badge>
+              </IconButton>
+            </Tooltip>
+
+            <Tooltip title="Notifications">
+              <IconButton
+                onClick={(e) => setNotificationAnchor(e.currentTarget)}
+                sx={{
+                  color: '#fff',
+                  backgroundColor: 'rgba(255,255,255,0.08)',
+                }}
+              >
+                <Badge badgeContent={3} color="error">
+                  <NotificationIcon />
+                </Badge>
+              </IconButton>
+            </Tooltip>
+
+            <Tooltip title="Account">
+              <IconButton onClick={(e) => setAnchorEl(e.currentTarget)}>
+                <Avatar
+                  sx={{
+                    width: 36,
+                    height: 36,
+                    fontSize: 14,
+                    background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                  }}
+                  src={user?.avatar}
+                >
+                  {user?.firstName?.[0]}
+                  {user?.lastName?.[0]}
+                </Avatar>
+              </IconButton>
+            </Tooltip>
+          </Box>
+        ) : (
+          <>
+            <Button
+              onClick={() => navigate('/login')}
+              sx={{ color: '#fff', textTransform: 'none' }}
+            >
+              Sign In
+            </Button>
+            <Button
+              onClick={() => navigate('/register')}
+              sx={{
+                ml: 1,
+                px: 3,
+                borderRadius: 999,
+                textTransform: 'none',
+                fontWeight: 600,
+                background: 'linear-gradient(90deg, #6366f1, #8b5cf6)',
+                color: '#fff',
+              }}
+            >
+              Create Account
+            </Button>
+          </>
+        )}
       </Toolbar>
 
-      {/* User Menu */}
+      {/* Account Menu */}
       <Menu
         anchorEl={anchorEl}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right',
+        open={Boolean(anchorEl)}
+        onClose={() => setAnchorEl(null)}
+        PaperProps={{
+          sx: {
+            mt: 1,
+            borderRadius: 3,
+            minWidth: 220,
+          },
         }}
-        id="primary-search-account-menu"
-        keepMounted
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
-        }}
-        open={isMenuOpen}
-        onClose={handleMenuClose}
       >
         <Box sx={{ px: 2, py: 1 }}>
-          <Typography variant="subtitle1" fontWeight="bold">
+          <Typography fontWeight={600}>
             {user?.firstName} {user?.lastName}
           </Typography>
           <Typography variant="caption" color="text.secondary">
@@ -248,59 +251,20 @@ const Header = ({ onMenuClick, showMenuButton }) => {
           </Typography>
         </Box>
         <Divider />
-        <MenuItem onClick={() => { navigate('/profile'); handleMenuClose(); }}>
+        <MenuItem onClick={() => navigate('/profile')}>
           <PersonIcon sx={{ mr: 1 }} /> Profile
         </MenuItem>
-        <MenuItem onClick={() => { navigate('/orders'); handleMenuClose(); }}>
+        <MenuItem onClick={() => navigate('/orders')}>
           <ReceiptIcon sx={{ mr: 1 }} /> My Orders
         </MenuItem>
         {(user?.roles?.includes('ADMIN') || user?.roles?.includes('FINANCE')) && (
-          <MenuItem onClick={() => { navigate('/admin'); handleMenuClose(); }}>
+          <MenuItem onClick={() => navigate('/admin')}>
             <DashboardIcon sx={{ mr: 1 }} /> Dashboard
           </MenuItem>
         )}
         <Divider />
         <MenuItem onClick={handleLogout}>
           <LogoutIcon sx={{ mr: 1 }} /> Logout
-        </MenuItem>
-      </Menu>
-
-      {/* Notifications Menu */}
-      <Menu
-        anchorEl={notificationAnchor}
-        open={Boolean(notificationAnchor)}
-        onClose={handleNotificationClose}
-        PaperProps={{
-          sx: { width: 320, maxHeight: 400 }
-        }}
-      >
-        <Box sx={{ p: 2 }}>
-          <Typography variant="h6">Notifications</Typography>
-        </Box>
-        <Divider />
-        <MenuItem onClick={handleNotificationClose}>
-          <Box>
-            <Typography variant="body2">Order #12345 has been shipped</Typography>
-            <Typography variant="caption" color="text.secondary">2 hours ago</Typography>
-          </Box>
-        </MenuItem>
-        <MenuItem onClick={handleNotificationClose}>
-          <Box>
-            <Typography variant="body2">New product added to wishlist</Typography>
-            <Typography variant="caption" color="text.secondary">5 hours ago</Typography>
-          </Box>
-        </MenuItem>
-        <MenuItem onClick={handleNotificationClose}>
-          <Box>
-            <Typography variant="body2">Price drop on items in your cart</Typography>
-            <Typography variant="caption" color="text.secondary">1 day ago</Typography>
-          </Box>
-        </MenuItem>
-        <Divider />
-        <MenuItem onClick={() => { navigate('/notifications'); handleNotificationClose(); }}>
-          <Typography variant="body2" color="primary" align="center" sx={{ width: '100%' }}>
-            View all notifications
-          </Typography>
         </MenuItem>
       </Menu>
     </AppBar>
