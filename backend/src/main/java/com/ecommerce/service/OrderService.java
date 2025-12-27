@@ -661,13 +661,14 @@ public class OrderService {
     private void createStatusHistory(Order order, Order.OrderStatus from,
             Order.OrderStatus to, String notes) {
         OrderStatusHistory history = new OrderStatusHistory();
-        history.setOrder(order);
-        history.setFromStatus(from);
-        history.setToStatus(to);
-        history.setNotes(notes);
-        history.setCreatedAt(LocalDateTime.now());
+history.setOrder(order);
+history.setStatus(order.getStatus());   // ✅ THIS FIXED YOUR SQL ERROR
+history.setFromStatus(from);
+history.setToStatus(to);
+history.setNotes(notes);
 
-        orderStatusHistoryRepository.save(history);
+orderStatusHistoryRepository.save(history);
+
     }
 
     private void releaseReservedStock(Order order) {
